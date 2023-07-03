@@ -66,6 +66,22 @@ CHUNK_PARSERS.set("tEXt", {
   }
 });
 
+CHUNK_PARSERS.set("iTXt", {
+  name: "Textual Data",
+  parser: (range: ByteRange) => {
+    let nullIndex = range.toUint8Array().findIndex(val => val === 0);
+    let keyword = range.bytes(0, nullIndex);
+    let separator = range.bytes(nullIndex, 1);
+    let text = range.bytes(nullIndex + 1);
+
+    return [
+      new Tree(`Keyword: ${keyword.readUTF8()}`, keyword),
+      new Tree(`Null Separator`, separator),
+      new Tree(`Text: ${text.readUTF8()}`, text)
+    ];
+  }
+});
+
 function inspect(range: ByteRange): Tree {
   let signature = range.bytes(0, 8);
 
